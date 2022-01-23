@@ -1,0 +1,20 @@
+mcdp {
+    provides endurance     [s]
+    provides extra_payload [kg]
+    provides extra_power   [W]
+
+    battery = instance `Battery
+    actuation = instance `Actuation
+
+    total_power = power required by actuation + provided extra_power
+    capacity provided by battery ≽ provided endurance · total_power
+
+    total_mass = mass required by battery  + provided extra_payload
+
+    gravity = 9.81 m/s²
+    weight = total_mass · gravity
+
+    lift provided by actuation ≽ weight
+
+    requires total_mass
+}
