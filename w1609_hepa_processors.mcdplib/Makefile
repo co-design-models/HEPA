@@ -1,3 +1,4 @@
+outd=out-Makefile
 
 all:
 	echo
@@ -6,7 +7,7 @@ clean:
 	echo
 
 plot1:
-	DISABLE_CONTRACTS=1 mcdp-plot --out out/plots/ Intel_i7
+	mcdp-plot --out $(outd)/plots/ Intel_i7
 
 code:
-	mcdp-plot --out out/plots/ ComposeProcessors
+	mcdp-plot --out $(outd)/plots/ ComposeProcessors
