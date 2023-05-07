@@ -1,17 +1,23 @@
 version: 2.1
-workflows: 
+parameters:
+  context_name:
+    type: string
+    default: << pipeline.git.branch >>
+workflows:
+  version: 2
   test:
     jobs:
-    - test-stage:
-        context: z7-stage 
-        
+    - test:
+        context: << pipeline.parameters.context_name >>
+
+
 jobs:
-  test-stage: 
+  test:
     docker:
-      - image: ${DOCKER_REGISTRY}/${DOCKER_TARGET_ORG}/${DOCKER_REPO_PREFIX}zuper-mcdp-deploy:${Z_DISTRO}
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
+    - image: ${DOCKER_REGISTRY}/${DOCKER_TARGET_ORG}/${DOCKER_REPO_PREFIX}zuper-mcdp-deploy:${Z_DISTRO}
+      auth:
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
     steps:
     - checkout
 
@@ -20,5 +26,3 @@ jobs:
         # language=bash
         command: |
           mcdp-load-libraries 
-    
-    
