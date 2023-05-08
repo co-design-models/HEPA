@@ -18,8 +18,8 @@ mcdp {
   provided inverse_of_max_latency <= inverse_of_max_latency provided by p1
   provided inverse_of_max_latency <= inverse_of_max_latency provided by p2
   # however each needs to provide half of the throughput
-  provided min_throughput * 0.5 dimensionless <=  min_throughput provided by p1
-  provided min_throughput * 0.5 dimensionless <=  min_throughput provided by p2
+  provided min_throughput * 0.5  <=  min_throughput provided by p1
+  provided min_throughput * 0.5  <=  min_throughput provided by p2
 
   # mass, power, and budget are simply summed together
   required mass   >= mass   required by p1 + mass   required by p2

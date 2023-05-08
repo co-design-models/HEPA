@@ -20,6 +20,7 @@ jobs:
         username: $DOCKER_USERNAME
         password: $DOCKER_PASSWORD
     steps:
+
     - checkout
     - run:
         name: Python stats

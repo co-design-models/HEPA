@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
 
-
 import itertools
+from decimal import Decimal
+from typing import Any
 
 import numpy as np
 
-from mcdp_ipython_utils.loading import solve_combinations
-from mcdp_ipython_utils.plotting import color_functions, color_resources, set_axis_colors
+from mcdp_ipython_utils import (
+    color_functions,
+    color_resources,
+    set_axis_colors,
+    solve_combinations,
+    SolveQueriesResult,
+    SolveQueryMultiple,
+)
 from mcdp_library import MCDPLibrary
+from mcdp_posets_algebra import frac_linspace
+from mcdp_report import griddata
 from plot_utils import ieee_fonts_zoom3, ieee_spines_zoom3
-from quickapp.quick_app import QuickApp
+from quickapp import QuickApp
 from reprep import Report
+from zuper_commons.text import ThingName
+from zuper_commons.types import ZValueError
 
 
 def get_library():
@@ -20,32 +31,33 @@ def get_library():
     return lib
 
 
-def go(model_name):
+def go(model_name: str) -> SolveQueriesResult[Any]:
     lib = get_library()
     nt = 15 * 4
     nr = 15 * 3
-    combinations = {
-        "min_throughput": (np.linspace(10, 1000, nt), "Hz"),
-        "resolution": (np.linspace(1.3, 10, nr), "pixels/deg"),
-        "inverse_of_max_latency": (0.0, "1/s"),
+    combinations0 = {
+        "min_throughput": (frac_linspace(10, 1000, nt), "Hz"),
+        "resolution": (frac_linspace(Decimal("1.3"), 10, nr), "pixels/deg"),
+        "inverse_of_max_latency": (0, "1/s"),
     }
+    combinations = SolveQueryMultiple(combinations0)
     result_like = dict(power="W", budget="USD")
-    ndp = lib.load_ndp(model_name)
+    si, ndp = lib.load_ndp(ThingName(model_name)).split()
 
     data = solve_combinations(ndp, combinations, result_like)
     return data
 
 
-def create_report1(data, model_name):
+def create_report1(data: SolveQueriesResult[Any], model_name: str) -> Report:
     all_min_throughput = []
     all_resolution = []
     all_num_solutions = []
     all_min_budget = []
     all_min_power = []
 
-    for query, query_results in zip(data["queries"], data["results"]):
-        resolution = query["resolution"]
-        min_throughput = query["min_throughput"]
+    for query, query_results in zip(data.queries, data.results):
+        resolution = query.q["resolution"]
+        min_throughput = query.q["min_throughput"]
         num_solutions = len(query_results)
 
         if num_solutions == 0:
@@ -103,7 +115,6 @@ def create_report1(data, model_name):
         do_axes(pylab)
 
     with r.plot("power", **fig) as pylab:
-
         ieee_spines_zoom3(pylab)
 
         x = all_resolution
@@ -114,7 +125,6 @@ def create_report1(data, model_name):
         do_axes(pylab)
 
     with r.plot("budget", **fig) as pylab:
-
         ieee_spines_zoom3(pylab)
 
         x = all_resolution
@@ -153,7 +163,7 @@ def plot_field(pylab, x, y, z, cmap):
         for x0, y0, z0 in itertools.product(x, y, z):
             if cx == x0 and cy == y0:
                 return z0
-        raise ValueError((cx, cy))
+        raise ZValueError(cx=cx, cy=cy)
 
     xu = np.sort(np.unique(x))
     yu = np.sort(np.unique(y))
@@ -164,9 +174,7 @@ def plot_field(pylab, x, y, z, cmap):
 
     X, Y = np.meshgrid(xu, yu)
 
-    from matplotlib.mlab import griddata
-
-    resampled = griddata(x, y, z, xu, yu, interp="linear")
+    resampled = griddata(x, y, z, xu, yu)
 
     pylab.pcolor(X, Y, resampled, cmap=cmap)  # vmin=1, vmax=100,
 
@@ -199,7 +207,6 @@ class App(QuickApp):
 #     fn = 'out/trade_space.html'
 #     print('writing to %r' % fn)
 #     r.to_html(fn)
-
 
 main = App.get_sys_main()
 if __name__ == "__main__":
