@@ -14,25 +14,22 @@ from mcdp_ipython_utils import (
     SolveQueriesResult,
     SolveQueryMultiple,
 )
-from mcdp_library import MCDPLibrary
+from mcdp_library import get_librarian
 from mcdp_posets_algebra import frac_linspace
 from mcdp_report import griddata
 from plot_utils import ieee_fonts_zoom3, ieee_spines_zoom3
 from quickapp import QuickApp
 from reprep import Report
-from zuper_commons.text import ThingName
+from zuper_commons.text import LibraryName, ThingName
 from zuper_commons.types import ZValueError
 
 
-def get_library():
-    lib = MCDPLibrary()
-    lib.use_cache_dir("_cached/plot_batteries_cache")
-    lib.add_search_dir(".")
-    return lib
-
-
 def go(model_name: str) -> SolveQueriesResult[Any]:
-    lib = get_library()
+    librarian = get_librarian(main_dir="../..")
+    lib = librarian.load_library(LibraryName("w1609_hepa_processors"))
+    lib.use_cache_dir("_cached/plot_trade_space_cache")
+
+    # lib = get_library()
     nt = 15 * 4
     nr = 15 * 3
     combinations0 = {
