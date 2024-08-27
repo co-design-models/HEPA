@@ -1,0 +1,10 @@
+mcdp {
+  a = instance `AnyAlternative
+
+  requires power for a
+  requires budget for a
+  requires mass for a
+  provides resolution using a
+  provides min_throughput using a
+  provides inverse_of_max_latency using a
+}
